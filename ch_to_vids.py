@@ -183,7 +183,7 @@ if __name__ == '__main__':
   client = get_authenticated_service(args)
 
   ##################################################
-  vidchannels = open("pet_channels_2.txt")
+  vidchannels = open("small_pet_channels_2.txt")
 
   ln = 1
   for line in vidchannels:

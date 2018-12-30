@@ -3,6 +3,7 @@
 
 ########################################################################################
 # Grabs all video ids from a list of Youtube video channels
+# Google to resolve import and auth. issues
 ########################################################################################
 
 import os
@@ -10,7 +11,6 @@ import sys
 import httplib2
 
 import google.oauth2.credentials
-
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError

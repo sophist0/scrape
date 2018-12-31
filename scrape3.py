@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+#############################################################################
+# Given video ids this code scrapes the top level comments from each video
+#############################################################################
+
 import httplib2
 import os
 import sys

@@ -11,6 +11,7 @@ import sys
 import httplib2
 
 import google.oauth2.credentials
+
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -161,7 +162,13 @@ def get_chId(response):
 	return tmp1[0]["id"]
 
 
-def channels_list_by_username(client, **kwargs):
+def get_chTitle(response):
+	tmp1 = response["items"]
+	tmp2 = tmp1[0]["snippet"]
+	return tmp2["title"]
+
+
+def channels_list_by_key(client, **kwargs):
   # See full sample for function
   kwargs = remove_empty_kwargs(**kwargs)
 
@@ -169,7 +176,7 @@ def channels_list_by_username(client, **kwargs):
     **kwargs
   ).execute()
 
-  return get_chId(response)
+  return response
 
 #################################################################
 
@@ -183,18 +190,19 @@ if __name__ == '__main__':
   client = get_authenticated_service(args)
 
   ##################################################
-  vidchannels = open("small_pet_channels_2.txt")
+  #vidchannels = open("small_pet_channels.txt")
+  vidchannels = open("small_pet_channels.txt")
 
   ln = 1
+  idx = 1
   for line in vidchannels:
     	if ln >= 10:
 		line2 = line.split("/")
 
 		if line2[3] == "user":
   			chTitle = line2[4] 
-  			chId = channels_list_by_username(client,
-    				part='snippet,contentDetails,statistics',
-    				forUsername=chTitle)
+  			response = channels_list_by_key(client,part='snippet',forUsername=chTitle)
+			chId = get_chId(response)
 
   			print
   			print "###############################################################"
@@ -202,14 +210,17 @@ if __name__ == '__main__':
   			print("Line " + str(ln) +": " + chTitle + " Channel Id: " + chId)
 		else:
 			chId = line2[4]
+  			response = channels_list_by_key(client,part='snippet',id=chId)
+			chTitle = get_chTitle(response)
+
   			print
   			print "###############################################################"
   			print
-  			print("Line " + str(ln) +": Channel Id: " + chId)
+  			print("Line " + str(ln) +": " + chTitle + " Channel Id: " + chId)
 
 	##################################################
 	  
-		nextToken = ""
+		nextToken = None
 		maxReturn = 50
 		vec = []
 		avec = []
@@ -229,7 +240,8 @@ if __name__ == '__main__':
 			if (len(vec) < maxReturn) or (nextToken == None):
 				break
 
-		ftmp = open("vdIds/videoIds_"+chId+".txt","w")
+		ftmp = open("vdIds/"+str(idx)+"_"+chId+".txt","w")
+		ftmp.write(("Channel Title: "+chTitle).encode('utf-8').strip()+"\n") 
 		ftmp.write("Channel Id: "+chId+"\n") 
 		ftmp.write("\n")
 		  
@@ -237,6 +249,7 @@ if __name__ == '__main__':
 			ftmp.write(vdid)
 			ftmp.write("\n")
 		ftmp.close()
+		idx += 1
 
 	# NEXT LINE
  	ln += 1
